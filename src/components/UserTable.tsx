@@ -1,35 +1,40 @@
 // src/components/UserTable.tsx
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Checkbox, Paper } from '@mui/material';
-import { useUsers } from '../context/UsersContext';
-import UserItem from './UserItem';
-
+import { Table, TableBody, TableContainer, Paper } from '@mui/material';
+import { useSelector } from 'react-redux';
+import UserRow from './UserRow';
+import { RootState } from '../app/store';
+import BulkActionsBar from './BulkActionsBar';
+import UserTableHeader from './UserTableHeader';
+import EditModal from './ModalEdit';
 
 interface UserTableProps {
-    
+  setSnackbarOpen : (value: boolean) => void
 }
 
-const UserTable: React.FC<UserTableProps> = () => {
+const UserTable: React.FC<UserTableProps> = ({setSnackbarOpen}) => {
 
-  const{filteredUsers} = useUsers();
+  const filteredUsers = useSelector((state: RootState) => state.users.filteredUsers);
+  const selectedUserIds = useSelector((state: RootState) => state.users.selectedUserIds);
 
   return (
     <TableContainer component={Paper}>
       <Table>
-        <TableHead>
-          <TableRow sx={{backgroundColor: 'rgb(145 158 171 / 20%)'}}>
-            <TableCell sx={{ width: '10px' }}><Checkbox /></TableCell>
-            <TableCell sx={{fontWeight: 'bold'}}>Name</TableCell>
-            <TableCell sx={{fontWeight: 'bold'}}>Phone Number</TableCell>
-            <TableCell sx={{fontWeight: 'bold'}}>Company</TableCell>
-            <TableCell sx={{fontWeight: 'bold'}}>Role</TableCell>
-            <TableCell sx={{fontWeight: 'bold'}}>Status</TableCell>
-          </TableRow>
-        </TableHead>
+        {selectedUserIds.length === 0 && 
+            <UserTableHeader 
+                selectedUsersCount={selectedUserIds.length} 
+                filteredUsersCount={filteredUsers.length} 
 
+              />}
+        {selectedUserIds.length > 0 && 
+            <BulkActionsBar 
+                selectedUsersCount={selectedUserIds.length} 
+                filteredUsersCount={filteredUsers.length}
+
+              />}
         <TableBody>
           {filteredUsers.map((user) => (
-            <UserItem user={user} key={user.id} />
+            <UserRow setSnackbarOpen={setSnackbarOpen}  user={user} key={user.id} />
           ))}
         </TableBody>
       </Table>

@@ -9,7 +9,7 @@ class UserService {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(this.users);
-      }, 1000);
+      }, 200);
     });
   }
 
@@ -17,7 +17,7 @@ class UserService {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(this.users.find(user => user.id === id));
-      }, 500);
+      }, 100);
     });
   }
 
@@ -31,18 +31,24 @@ class UserService {
   }
 
   async updateUser(id: number, user: Partial<IUser>): Promise<IUser | undefined> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const index = this.users.findIndex(u => u.id === id);
-        if (index !== -1) {
-          this.users[index] = { ...this.users[index], ...user };
-          resolve(this.users[index]);
-        } else {
-          resolve(undefined);
-        }
-      }, 500);
-    });
-  }
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const index = this.users.findIndex(u => u.id === id);
+      if (index !== -1) {
+        const updatedUser = { ...this.users[index], ...user };
+        this.users = [
+          ...this.users.slice(0, index),
+          updatedUser,
+          ...this.users.slice(index + 1)
+        ];
+        resolve(updatedUser);
+      } else {
+        resolve(undefined);
+      }
+    }, 100);
+  });
+}
+
 
   async deleteUser(id: number): Promise<boolean> {
     return new Promise((resolve) => {

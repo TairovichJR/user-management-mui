@@ -3,6 +3,7 @@ import { ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { createContext } from "react";
 import { ITab, IUser } from "../model";
 import UserService from "../hooks/UserService";
+import { userData } from "../data";
 
 interface UsersProviderProps {
   children: ReactNode;
@@ -12,30 +13,24 @@ interface UsersContextProps {
   filteredUsers: IUser[];
   setSearchKey: (value: string) => void;
   searchKey: string;
-  tabs: ITab[];
   setTab: (value: string) => void;
   tab: string;
-  addRoles: (role: string) => void;
-  roles: string[];
-  allUserRoles: string[];
-  setRoles: (roles: string[]) => void;
+  toggleRole: (role: string) => void;
+  toggledRoles: string[];
+  roleValues: string[];
   resetAllFilters: () => void;
   isFilterOn: boolean;
-  createUser: (user: IUser) => Promise<IUser>;
-  updateUser: (id: number, user: Partial<IUser>) => Promise<IUser | undefined>;
-  deleteUser: (id: number) => Promise<boolean>;
+  statusTabs: Record<string,number>;
 }
 
 const UsersContext = createContext<UsersContextProps | undefined>(undefined);
-
-const tabs_array = ['Active', 'Pending', 'Banned', 'Rejected'];
 
 export const UsersProvider = ({ children }: UsersProviderProps) => {
   const [searchKey, setSearchKey] = useState('');
   const [users, setUsers] = useState<IUser[]>([]);
   const [tab, setTab] = useState('all');
-  const [allUserRoles, setAllUserRoles] = useState<string[]>([]);
-  const [roles, setRoles] = useState<string[]>([]);
+  const [roleValues, setRoleValues] = useState<string[]>([]);
+  const [toggledRoles, setToggledRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +41,7 @@ export const UsersProvider = ({ children }: UsersProviderProps) => {
       try {
         const data = await UserService.fetchUsers();
         setUsers(data);
-        setAllUserRoles(Array.from(new Set(data.map((user) => user.role))));
+        setRoleValues(Array.from(new Set(data.map((user) => user.role))));
       } catch (err) {
         setError("Failed to fetch users");
       } finally {
@@ -57,8 +52,8 @@ export const UsersProvider = ({ children }: UsersProviderProps) => {
     fetchData();
   }, []);
 
-  const addRoles = (role: string) => {
-    setRoles((prev) => {
+  const toggleRole = (role: string) => {
+    setToggledRoles((prev) => {
       if (prev.includes(role)) {
         return prev.filter((r) => r !== role); // Remove role if it already exists
       } else {
@@ -71,41 +66,29 @@ export const UsersProvider = ({ children }: UsersProviderProps) => {
     return users.filter((user) => {
       const matchesStatus = tab === 'all' || user.status.toLowerCase() === tab;
       const matchesSearchKey = user.name.toLowerCase().includes(searchKey);
-      const matchesRoles = roles.length === 0 || roles.includes(user.role);
+      const matchesRoles = toggledRoles.length === 0 || toggledRoles.includes(user.role);
       return matchesStatus && matchesSearchKey && matchesRoles;
     });
-  }, [searchKey, users, tab, roles]);
+  }, [searchKey, users, tab, toggledRoles]);
 
-  const tabs = useMemo<ITab[]>(() => {
-    const result = tabs_array.map((t) => {
-      return {
-        tabName: t,
-        count: users.filter((user) => user.status === t).length,
-      };
-    });
-    result.unshift({ tabName: 'All', count: users.length });
+  const statusTabs = useMemo(()=>{
+    const result:Record<string,number> = { "All": userData.length,  "Active": 0, "Banned": 0, "Pending": 0, "Rejected" : 0};
+    for(let i = 0; i < userData.length; i++){
+        let status = userData[i].status; 
+        const currValue = result[status];
+        result[status] = currValue + 1;
+        
+    }
     return result;
   }, [users]);
 
   const resetAllFilters = () => {
     setTab('all');
     setSearchKey('');
-    setRoles([]);
+    setToggledRoles([]);
   }
 
-  const isFilterOn = tab !== 'all' || roles.length > 0 || searchKey.trim().length > 0;
-
-  const createUser = async (user: IUser) => {
-    return await UserService.createUser(user);
-  };
-
-  const updateUser = async (id: number, user: Partial<IUser>) => {
-    return await UserService.updateUser(id, user);
-  };
-
-  const deleteUser = async (id: number) => {
-    return await UserService.deleteUser(id);
-  };
+  const isFilterOn = tab !== 'all' || toggledRoles.length > 0 || searchKey.trim().length > 0;
 
   if (loading) {
     return <div>Loading...</div>;
@@ -117,9 +100,8 @@ export const UsersProvider = ({ children }: UsersProviderProps) => {
 
   return (
     <UsersContext.Provider value={{
-      setSearchKey, filteredUsers, tabs, tab, setTab,
-      roles, allUserRoles, addRoles, searchKey, setRoles, resetAllFilters, isFilterOn,
-      createUser, updateUser, deleteUser
+      setSearchKey, filteredUsers, tab, setTab,
+      toggledRoles, roleValues, toggleRole, searchKey, resetAllFilters, isFilterOn, statusTabs
     }}>
       {children}
     </UsersContext.Provider>
