@@ -1,10 +1,10 @@
 import { TableHead, TableRow, TableCell, Checkbox, Typography } from '@mui/material'
-import { deleteSelectedUsers, toggleHeaderCheckbox, openDialog, closeDialog, openSnackbar, setSnackbarText } from '../app/features/userSlice'
+import { deleteUsersByIds, toggleHeaderCheckbox, openDialog, closeDialog, openSnackbar, setSnackbarText } from '../app/features/userSlice'
 import { useDispatch, useSelector } from 'react-redux';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
-import DeleteDialog from './DeleteDialog';
-import { RootState } from '../app/store';
+import DeleteDialog from './CustomDialog';
+import { AppDispatch, RootState } from '../app/store';
 
 interface BulkActionsBarProps{
     selectedUsersCount: number;
@@ -13,9 +13,9 @@ interface BulkActionsBarProps{
 
 const BulkActionsBar = ({selectedUsersCount, filteredUsersCount} : BulkActionsBarProps) => {
 
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const dialog = useSelector((state:RootState) => state.users.dialogOpen);
+    const dialog = useSelector((state:RootState) => state.users.dialog);
 
     const handleDeleteButtonClick = () => {
       dispatch(openDialog());
@@ -38,8 +38,7 @@ const BulkActionsBar = ({selectedUsersCount, filteredUsersCount} : BulkActionsBa
     }
 
     const handleDeleteSelectedUsers = () => {
-        dispatch(deleteSelectedUsers());
-
+        dispatch(deleteUsersByIds());
     }
 
   return (

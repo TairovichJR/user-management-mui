@@ -2,15 +2,15 @@ import { Avatar, Checkbox, IconButton, Menu, MenuItem, TableCell, TableRow, Tool
 import { IUser } from "../model";
 import { Box } from "@mui/system";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../app/store";
-import { toggleUserRowCheckbox, deleteSelectedUser, closeDialog, openDialog, openSnackbar, setSnackbarText } from "../app/features/userSlice";
+import { AppDispatch, RootState } from "../app/store";
+import { toggleUserRowCheckbox, deleteUserById, closeDialog, openDialog, openSnackbar, setSnackbarText } from "../app/features/userSlice";
 import MoreVert from '@mui/icons-material/MoreVert';
 import Edit from '@mui/icons-material/Edit';
 import Delete from '@mui/icons-material/Delete';
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ModalEdit from "./ModalEdit";
-import DeleteDialog from "./DeleteDialog";
+import CustomDialog from "./CustomDialog";
 
 interface UserItemProps {
   user: IUser;
@@ -20,9 +20,9 @@ const UserRow = ({ user }: UserItemProps) => {
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const isUserSelected = useSelector((state: RootState) => state.users.selectedUserIds).indexOf(user.id) !== -1;
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [modal, setModal] = useState(false);
-  const dialog = useSelector((state: RootState) => state.users.dialogOpen);
+  const dialog = useSelector((state: RootState) => state.users.dialog);
   const navigate = useNavigate();
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
@@ -30,7 +30,7 @@ const UserRow = ({ user }: UserItemProps) => {
   };
 
   const handleDeleteUser = (id:number) => {
-    dispatch(deleteSelectedUser(id));
+    dispatch(deleteUserById(id));
   }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -115,7 +115,7 @@ const UserRow = ({ user }: UserItemProps) => {
             <MenuItem onClick={e => navigate(`/users/${user.id}/edit`)} >
               <Edit fontSize="small" sx={{ marginRight: 1 }} /> Edit
             </MenuItem>
-            <DeleteDialog
+            <CustomDialog
               open={dialog}
               onClose={handleDeleteDialogClose}
               onConfirm={handleDeleteConfirm}

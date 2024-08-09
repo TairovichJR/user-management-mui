@@ -7,7 +7,7 @@ interface DeleteDialogProps {
   onConfirm: () => void;
 }
 
-const DeleteDialog: React.FC<DeleteDialogProps> = ({ open, onClose, onConfirm }) => {
+const CustomDialog: React.FC<DeleteDialogProps> = ({ open, onClose, onConfirm }) => {
   return (
     <Dialog
       open={open}
@@ -33,4 +33,4 @@ const DeleteDialog: React.FC<DeleteDialogProps> = ({ open, onClose, onConfirm })
   );
 };
 
-export default DeleteDialog;
+export default CustomDialog;

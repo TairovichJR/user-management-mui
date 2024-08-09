@@ -102,6 +102,10 @@ const UserDetails = () => {
     }
   };
 
+  const handleDeleteUser = () => {
+      // dispatch()
+  }
+
   if (userDetailsLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
@@ -164,7 +168,7 @@ const UserDetails = () => {
           <Switch aria-label='Email Verified' />
         </Box>
 
-        <Button variant='contained' sx={{
+        <Button onClick={handleDeleteUser} variant='contained' sx={{
           backgroundColor: 'rgb(255 244 229)', color: '#B71D18',
           '&:hover': {
             backgroundColor: 'rgb(255 86 48 / 32%)',

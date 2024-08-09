@@ -17,7 +17,7 @@ interface UsersState {
   userDetails: IUser | null;
   userDetailsLoading: boolean;
   userDetailsError: string | null;
-  dialogOpen: boolean;
+  dialog: boolean;
   snackbar: boolean;
   snackbarText: string;
 }
@@ -36,7 +36,7 @@ const initialState: UsersState = {
   userDetails: null,
   userDetailsLoading: false,
   userDetailsError: null,
-  dialogOpen: false,
+  dialog: false,
   snackbar: false,
   snackbarText: ''
 };
@@ -45,7 +45,6 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
   const response = await UserService.fetchUsers();
   return response;
 });
-
 
 export const getUserDetails = createAsyncThunk('users/getUserDetails', async (id: number) => {
   const response = await UserService.getUser(id);
@@ -57,25 +56,36 @@ export const updateUserDetails = createAsyncThunk('users/updateUserDetails', asy
   return response;
 });
 
+export const deleteUserById = createAsyncThunk('users/deleteUser', async (id: number) => {
+  await UserService.deleteUser(id);
+  return id;
+});
+
+export const deleteUsersByIds = createAsyncThunk('users/deleteUsers', async (_, { getState }) => {
+  const state = getState() as { users: UsersState };
+  const selectedUserIds = state.users.selectedUserIds;
+  await UserService.deleteUsersByIds(selectedUserIds);
+  return selectedUserIds;
+});
 
 const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    setSnackbarText (state, action: PayloadAction<string>){
+    setSnackbarText(state, action: PayloadAction<string>) {
       state.snackbarText = action.payload;
     },
-    openSnackbar (state) {
+    openSnackbar(state) {
       state.snackbar = true;
     },
     closeSnackbar(state) {
       state.snackbar = false;
     },
-    openDialog (state) {
-        state.dialogOpen = true;
+    openDialog(state) {
+      state.dialog = true;
     },
-    closeDialog (state) {
-      state.dialogOpen = false;
+    closeDialog(state) {
+      state.dialog = false;
     },
     setSearchKey(state, action: PayloadAction<string>) {
       state.searchKey = action.payload;
@@ -103,57 +113,45 @@ const usersSlice = createSlice({
     setFilteredUsers(state) {
       state.filteredUsers = state.users.filter((user) => {
         const matchesStatus = state.tab === 'all' || user.status.toLowerCase() === state.tab;
-        const matchesSearchKey = user.name.toLowerCase().includes(state.searchKey);
+        const matchesSearchKey = user.name.toLowerCase().includes(state.searchKey.toLowerCase());
         const matchesRoles = state.toggledRoles.length === 0 || state.toggledRoles.includes(user.role);
         return matchesStatus && matchesSearchKey && matchesRoles;
       });
     },
-    // this is for handling the table header checkbox
     toggleHeaderCheckbox(state) {
-      if(state.selectedUserIds.length > 0){
+      if (state.selectedUserIds.length > 0) {
         state.selectedUserIds = [];
-      }else{
-        const filteredUserIds = state.filteredUsers.map((user:IUser) => user.id);
+      } else {
+        const filteredUserIds = state.filteredUsers.map((user: IUser) => user.id);
         state.selectedUserIds = filteredUserIds;
       }
-      console.log(state.selectedUserIds);
     },
-
-    // this is for handling each user row checkbox
-    toggleUserRowCheckbox (state, action: PayloadAction<number>){
+    toggleUserRowCheckbox(state, action: PayloadAction<number>) {
       const selectedIndex = state.selectedUserIds.indexOf(action.payload);
       let tempSelectedIds: number[] = [];
 
-      if(selectedIndex === -1){
+      if (selectedIndex === -1) {
         tempSelectedIds = tempSelectedIds.concat(state.selectedUserIds, action.payload);
-      }
-      else if(selectedIndex === 0){
+      } else if (selectedIndex === 0) {
         tempSelectedIds = tempSelectedIds.concat(state.selectedUserIds.slice(1));
-      }
-      else if(selectedIndex === state.selectedUserIds.length-1){
+      } else if (selectedIndex === state.selectedUserIds.length - 1) {
         tempSelectedIds = tempSelectedIds.concat(state.selectedUserIds.slice(0, -1));
-      }
-      else if(selectedIndex > 0){
+      } else if (selectedIndex > 0) {
         tempSelectedIds.slice(0, selectedIndex);
-        tempSelectedIds.slice(selectedIndex+1);
+        tempSelectedIds.slice(selectedIndex + 1);
       }
       state.selectedUserIds = tempSelectedIds;
     },
-
-    //this is for deleting selected users in bulk from table header
     deleteSelectedUsers(state) {
-        state.users = state.users.filter((user) => !state.selectedUserIds.includes(user.id));
-        state.selectedUserIds = [];
-        usersSlice.caseReducers.setFilteredUsers(state);
+      state.users = state.users.filter((user) => !state.selectedUserIds.includes(user.id));
+      state.selectedUserIds = [];
+      usersSlice.caseReducers.setFilteredUsers(state);
     },
-
-   //  this is for deleting an individual user
-    deleteSelectedUser(state, action:PayloadAction<number>) {
+    deleteSelectedUser(state, action: PayloadAction<number>) {
       state.selectedUserIds = state.selectedUserIds.filter((userId) => userId !== action.payload);
       state.users = state.users.filter((user) => user.id !== action.payload);
       usersSlice.caseReducers.setFilteredUsers(state);
     }
-     
   },
   extraReducers: (builder) => {
     builder
@@ -212,15 +210,27 @@ const usersSlice = createSlice({
       .addCase(updateUserDetails.rejected, (state, action) => {
         state.userDetailsLoading = false;
         state.userDetailsError = action.error.message || 'Failed to update user details';
+      })
+      .addCase(deleteUserById.fulfilled, (state, action: PayloadAction<number>) => {
+        state.users = state.users.filter((user) => user.id !== action.payload);
+        state.selectedUserIds = state.selectedUserIds.filter(id => id !== action.payload);
+        usersSlice.caseReducers.setFilteredUsers(state);
+      })
+      .addCase(deleteUsersByIds.fulfilled, (state, action: PayloadAction<number[]>) => {
+        state.users = state.users.filter((user) => !action.payload.includes(user.id));
+        state.selectedUserIds = [];
+        usersSlice.caseReducers.setFilteredUsers(state);
       });
   },
-  
 });
 
-export const setIsFilterOn = (state: UsersState) => {
+export const setIsFilterOn = (state: UsersState): boolean => {
   return state.searchKey.trim().length > 0 || state.tab !== 'all' || state.toggledRoles.length > 0;
 };
 
-export const { setSearchKey, setTab, toggleRole, resetAllFilters, setFilteredUsers,toggleHeaderCheckbox, toggleUserRowCheckbox,
-  deleteSelectedUsers,deleteSelectedUser, openDialog, closeDialog, openSnackbar, closeSnackbar, setSnackbarText} = usersSlice.actions;
+export const { 
+  setSearchKey, setTab, toggleRole, resetAllFilters, setFilteredUsers, toggleHeaderCheckbox, toggleUserRowCheckbox,
+  deleteSelectedUsers, deleteSelectedUser, openDialog, closeDialog, openSnackbar, closeSnackbar, setSnackbarText 
+} = usersSlice.actions;
+
 export default usersSlice.reducer;

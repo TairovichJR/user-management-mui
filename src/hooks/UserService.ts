@@ -58,6 +58,15 @@ class UserService {
       }, 500);
     });
   }
+
+  async deleteUsersByIds(ids: number[]): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        this.users = this.users.filter(user => !ids.includes(user.id));
+        resolve();
+      }, 500);
+    });
+  }
 }
 
 export default new UserService();
