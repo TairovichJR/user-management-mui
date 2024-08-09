@@ -3,14 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, CircularProgress, Paper, Switch, TextField, Typography } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserDetails, updateUserDetails } from '../app/features/userSlice';
+import { getUserDetails, openSnackbar, setSnackbarText, updateUserDetails } from '../app/features/userSlice';
 import { RootState, AppDispatch } from '../app/store';
 
-interface UserDetailsProps {
-  setSnackbarOpen: (value:boolean) => void;
-}
 
-const UserDetails = ({setSnackbarOpen}: UserDetailsProps) => {
+const UserDetails = () => {
 
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
@@ -100,7 +97,8 @@ const UserDetails = ({setSnackbarOpen}: UserDetailsProps) => {
     if (!hasErrors) {
       dispatch(updateUserDetails({ id: parseInt(id as string), user: updatedUser }));
       navigate('/');
-      setSnackbarOpen(true);
+      dispatch(setSnackbarText('Update Success!'));
+      dispatch(openSnackbar());
     }
   };
 

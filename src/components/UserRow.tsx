@@ -3,7 +3,7 @@ import { IUser } from "../model";
 import { Box } from "@mui/system";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../app/store";
-import { toggleUserRowCheckbox, deleteSelectedUser, closeDialog, openDialog } from "../app/features/userSlice";
+import { toggleUserRowCheckbox, deleteSelectedUser, closeDialog, openDialog, openSnackbar, setSnackbarText } from "../app/features/userSlice";
 import MoreVert from '@mui/icons-material/MoreVert';
 import Edit from '@mui/icons-material/Edit';
 import Delete from '@mui/icons-material/Delete';
@@ -14,10 +14,9 @@ import DeleteDialog from "./DeleteDialog";
 
 interface UserItemProps {
   user: IUser;
-  setSnackbarOpen : (value: boolean) => void
 }
 
-const UserRow = ({ user, setSnackbarOpen }: UserItemProps) => {
+const UserRow = ({ user }: UserItemProps) => {
   
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const isUserSelected = useSelector((state: RootState) => state.users.selectedUserIds).indexOf(user.id) !== -1;
@@ -49,6 +48,8 @@ const UserRow = ({ user, setSnackbarOpen }: UserItemProps) => {
   const handleDeleteConfirm = () => {
     handleDeleteUser(user.id);
     dispatch(closeDialog());
+    dispatch(setSnackbarText('Delete Success!'));
+    dispatch(openSnackbar());
   }
 
   const handleDeleteButtonClick = () => {
@@ -58,7 +59,7 @@ const UserRow = ({ user, setSnackbarOpen }: UserItemProps) => {
 
   return (
     <>
-      {modal && <ModalEdit setSnackbarOpen={setSnackbarOpen} modal={modal} setModal={setModal} userId={user.id}  /> }
+      <ModalEdit modal={modal} setModal={setModal} userId={user.id} />
       <TableRow key={user.id}>
         <TableCell sx={{ width: '10px' }}>
           <Checkbox checked={isUserSelected} onChange={e => handleCheckboxChange(e, user.id)} />

@@ -18,6 +18,8 @@ interface UsersState {
   userDetailsLoading: boolean;
   userDetailsError: string | null;
   dialogOpen: boolean;
+  snackbar: boolean;
+  snackbarText: string;
 }
 
 const initialState: UsersState = {
@@ -34,7 +36,9 @@ const initialState: UsersState = {
   userDetails: null,
   userDetailsLoading: false,
   userDetailsError: null,
-  dialogOpen: false
+  dialogOpen: false,
+  snackbar: false,
+  snackbarText: ''
 };
 
 export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
@@ -58,6 +62,15 @@ const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
+    setSnackbarText (state, action: PayloadAction<string>){
+      state.snackbarText = action.payload;
+    },
+    openSnackbar (state) {
+      state.snackbar = true;
+    },
+    closeSnackbar(state) {
+      state.snackbar = false;
+    },
     openDialog (state) {
         state.dialogOpen = true;
     },
@@ -209,5 +222,5 @@ export const setIsFilterOn = (state: UsersState) => {
 };
 
 export const { setSearchKey, setTab, toggleRole, resetAllFilters, setFilteredUsers,toggleHeaderCheckbox, toggleUserRowCheckbox,
-  deleteSelectedUsers,deleteSelectedUser, openDialog, closeDialog} = usersSlice.actions;
+  deleteSelectedUsers,deleteSelectedUser, openDialog, closeDialog, openSnackbar, closeSnackbar, setSnackbarText} = usersSlice.actions;
 export default usersSlice.reducer;

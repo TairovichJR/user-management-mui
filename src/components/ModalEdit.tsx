@@ -2,7 +2,7 @@ import { Box, Button, FormControl, InputLabel, MenuItem, Modal, Paper, Select, S
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../app/store';
-import { getUserDetails, updateUserDetails } from '../app/features/userSlice';
+import { getUserDetails, openSnackbar, setSnackbarText, updateUserDetails } from '../app/features/userSlice';
 
 const StyledModal = styled(Modal)({
   display: 'flex',
@@ -15,10 +15,9 @@ interface EditModalProps {
   modal: boolean;
   setModal: (value: boolean) => void;
   userId: number;
-  setSnackbarOpen: (value:boolean) => void;
 }
 
-const ModalEdit = ({ modal, setModal, userId, setSnackbarOpen }: EditModalProps) => {
+const ModalEdit = ({ modal, setModal, userId }: EditModalProps) => {
   const [status, setStatus] = useState('');
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -109,7 +108,8 @@ const ModalEdit = ({ modal, setModal, userId, setSnackbarOpen }: EditModalProps)
     if (!hasErrors) {
       dispatch(updateUserDetails({ id: userId, user: updatedUser }));
       setModal(false);
-      setSnackbarOpen(true);
+      dispatch(setSnackbarText('Update Success!'));
+      dispatch(openSnackbar());
     }
   };
 

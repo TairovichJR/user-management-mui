@@ -1,5 +1,5 @@
 import { TableHead, TableRow, TableCell, Checkbox, Typography } from '@mui/material'
-import { deleteSelectedUsers, toggleHeaderCheckbox, openDialog, closeDialog } from '../app/features/userSlice'
+import { deleteSelectedUsers, toggleHeaderCheckbox, openDialog, closeDialog, openSnackbar, setSnackbarText } from '../app/features/userSlice'
 import { useDispatch, useSelector } from 'react-redux';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useState } from 'react';
@@ -28,6 +28,9 @@ const BulkActionsBar = ({selectedUsersCount, filteredUsersCount} : BulkActionsBa
     const handleDeleteConfirm = () => {
         handleDeleteSelectedUsers();
         dispatch(closeDialog());
+        dispatch(setSnackbarText('Delete Success!'));
+        dispatch(openSnackbar());
+
     };
 
     const handleHeaderCheckboxChange = () => {

@@ -11,19 +11,11 @@ import { fetchUsers } from "../app/features/userSlice";
 import { RootState, AppDispatch } from "../app/store";
 import { Route, Routes } from "react-router-dom";
 import UserDetails from "./UserDetails";
-import SuccessSnackBar from "./SuccessSnackBar";
+import CustomSnackbar from "./CustomSnackbar";
 
 const UsersPage = () => {
     const dispatch = useDispatch<AppDispatch>();
     const loading = useSelector((state: RootState) => state.users.loading);
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-
-    const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
-        if (reason === 'clickaway') {
-        return;
-        }
-        setSnackbarOpen(false);
-  };
 
     useEffect(() => {
         dispatch(fetchUsers());
@@ -40,16 +32,16 @@ const UsersPage = () => {
 
     return (
         <Container component={Paper} maxWidth="lg" sx={{ marginTop: '40px', paddingTop: '10px', paddingBottom: '50px' }}>
-            <SuccessSnackBar open={snackbarOpen} handleClose={handleSnackbarClose} />
+            <CustomSnackbar />
             <Routes>
                 <Route path="/" element={<>
                     <StatusTabs />
                     <UserFilters />
                     <FilterTags />
-                    <UserTable setSnackbarOpen={setSnackbarOpen} />
+                    <UserTable />
                     </>} 
                  />
-                <Route path="/users/:id/edit" element={<UserDetails setSnackbarOpen={setSnackbarOpen} />} />
+                <Route path="/users/:id/edit" element={<UserDetails />} />
             </Routes>
         </Container>
     );

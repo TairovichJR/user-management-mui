@@ -2,6 +2,9 @@ import styled from "@emotion/styled";
 import { CheckCircle, Close } from "@mui/icons-material";
 import { SnackbarContent, IconButton, Snackbar, Typography, SnackbarCloseReason } from "@mui/material";
 import { Box } from "@mui/system";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../app/store";
+import { closeSnackbar } from "../app/features/userSlice";
 
 const CustomSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
     backgroundColor: '#f0fff4',
@@ -18,24 +21,31 @@ const CustomSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
     marginLeft: 'auto',
   });
 
-  interface SuccessSnackbarProps {
-    open: boolean;
-    handleClose: (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => void;
-  }
+  const CustomSnackbar = () => {
 
-  const SuccessSnackbar = ({ open, handleClose }: SuccessSnackbarProps) => {
+    const snackbar = useSelector((state:RootState) => state.users.snackbar);
+    const snackbarText = useSelector((state:RootState) => state.users.snackbarText);
+    const dispatch = useDispatch();
+
+    const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+      if (reason === 'clickaway') {
+      return;
+      }
+      dispatch(closeSnackbar());
+   };
+
     return (
       <Snackbar
-        open={open}
+        open={snackbar}
         autoHideDuration={3000}
-        onClose={handleClose}
+        onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
         <CustomSnackbarContent
           message={
             <Box display="flex" alignItems="center">
               <CheckCircle style={{ color: 'green', marginRight: '8px' }} />
-              <Typography variant="body2" style={{ color: '#1a3e1a' }}>Update success!</Typography>
+              <Typography variant="body2" style={{ color: '#1a3e1a' }}>{snackbarText}</Typography>
             </Box>
           }
           action={
@@ -43,7 +53,7 @@ const CustomSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
               size="small"
               aria-label="close"
               color="inherit"
-              onClick={handleClose}
+              onClick={handleSnackbarClose}
             >
               <Close fontSize="small" />
             </CustomIconButton>
@@ -53,4 +63,4 @@ const CustomSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
     );
   };
 
-  export default SuccessSnackbar;
+  export default CustomSnackbar;

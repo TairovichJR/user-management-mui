@@ -8,11 +8,8 @@ import BulkActionsBar from './BulkActionsBar';
 import UserTableHeader from './UserTableHeader';
 import EditModal from './ModalEdit';
 
-interface UserTableProps {
-  setSnackbarOpen : (value: boolean) => void
-}
 
-const UserTable: React.FC<UserTableProps> = ({setSnackbarOpen}) => {
+const UserTable: React.FC = () => {
 
   const filteredUsers = useSelector((state: RootState) => state.users.filteredUsers);
   const selectedUserIds = useSelector((state: RootState) => state.users.selectedUserIds);
@@ -24,7 +21,6 @@ const UserTable: React.FC<UserTableProps> = ({setSnackbarOpen}) => {
             <UserTableHeader 
                 selectedUsersCount={selectedUserIds.length} 
                 filteredUsersCount={filteredUsers.length} 
-
               />}
         {selectedUserIds.length > 0 && 
             <BulkActionsBar 
@@ -34,7 +30,7 @@ const UserTable: React.FC<UserTableProps> = ({setSnackbarOpen}) => {
               />}
         <TableBody>
           {filteredUsers.map((user) => (
-            <UserRow setSnackbarOpen={setSnackbarOpen}  user={user} key={user.id} />
+            <UserRow user={user} key={user.id} />
           ))}
         </TableBody>
       </Table>
