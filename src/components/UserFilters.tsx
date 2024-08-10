@@ -5,10 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../app/store';
 import { toggleRole, setSearchKey } from '../app/features/userSlice';
 
-
-interface UserFiltersProps {}
-
-const UserFilters: React.FC<UserFiltersProps> = () => {
+const UserFilters: React.FC = () => {
   const dispatch = useDispatch();
   const searchKey = useSelector((state: RootState) => state.users.searchKey);
   const toggledRoles = useSelector((state: RootState) => state.users.toggledRoles);

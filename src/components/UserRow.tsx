@@ -60,11 +60,12 @@ const UserRow = ({ user }: UserItemProps) => {
   return (
     <>
       <ModalEdit modal={modal} setModal={setModal} userId={user.id} />
-      <TableRow key={user.id}>
+      <TableRow key={user.id} >
         <TableCell sx={{ width: '10px' }}>
           <Checkbox checked={isUserSelected} onChange={e => handleCheckboxChange(e, user.id)} />
         </TableCell>
-        <TableCell sx={{ display: 'flex', justifyContent: 'flex-start', gap: 2, alignItems: 'center' }}>
+        <TableCell 
+            sx={{ display: 'flex', justifyContent: 'start', gap: 2, alignItems: 'center', alignContent: 'center' }}>
           <Avatar alt={user.name} src={user.imgSource} />
           <Box component="div">
             <Typography 

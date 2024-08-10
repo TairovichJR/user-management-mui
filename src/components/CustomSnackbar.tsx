@@ -29,7 +29,7 @@ const CustomSnackbarContent = styled(SnackbarContent)(({ theme }) => ({
 
     const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
       if (reason === 'clickaway') {
-      return;
+        return;
       }
       dispatch(closeSnackbar());
    };

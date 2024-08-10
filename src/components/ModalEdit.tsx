@@ -68,10 +68,6 @@ const ModalEdit = ({ modal, setModal, userId }: EditModalProps) => {
     }
   }, [userDetails]);
 
-  const handleStatusChange = (event: SelectChangeEvent) => {
-    setStatus(event.target.value as string);
-  };
-
   const handleSaveChanges = () => {
     const updatedUser = {
       id: userId,

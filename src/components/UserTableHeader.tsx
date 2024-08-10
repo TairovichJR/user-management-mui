@@ -1,7 +1,6 @@
 import { TableHead, TableRow, TableCell, Checkbox, Box } from '@mui/material'
 import { useDispatch } from 'react-redux';
 import { toggleHeaderCheckbox } from '../app/features/userSlice';
-import { useState } from 'react';
 import { IUser } from '../model';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ArrowDownward from '@mui/icons-material/ArrowDownward';
