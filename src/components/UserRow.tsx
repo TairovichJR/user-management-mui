@@ -7,7 +7,7 @@ import { toggleUserRowCheckbox, deleteUserById, closeDialog, openDialog, openSna
 import MoreVert from '@mui/icons-material/MoreVert';
 import Edit from '@mui/icons-material/Edit';
 import Delete from '@mui/icons-material/Delete';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ModalEdit from "./ModalEdit";
 import CustomDialog from "./CustomDialog";

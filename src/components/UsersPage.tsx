@@ -2,11 +2,11 @@
 import { Container } from "@mui/system";
 import StatusTabs from "./StatusTabs";
 import UserFilters from "./UserFilters";
-import { Paper, CircularProgress, Box, Typography, SnackbarCloseReason } from "@mui/material";
+import { Paper, CircularProgress, Box, Typography } from "@mui/material";
 import UserTable from "./UserTable";
 import FilterTags from "./FilterTags";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { fetchUsers } from "../app/features/userSlice";
 import { RootState, AppDispatch } from "../app/store";
 import { Route, Routes } from "react-router-dom";

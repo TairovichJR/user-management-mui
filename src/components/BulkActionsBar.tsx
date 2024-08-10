@@ -8,10 +8,10 @@ import { AppDispatch, RootState } from '../app/store';
 
 interface BulkActionsBarProps{
     selectedUsersCount: number;
-    filteredUsersCount: number; 
+    sortedUsersCount: number; 
 }
 
-const BulkActionsBar = ({selectedUsersCount, filteredUsersCount} : BulkActionsBarProps) => {
+const BulkActionsBar = ({selectedUsersCount, sortedUsersCount} : BulkActionsBarProps) => {
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -52,8 +52,8 @@ const BulkActionsBar = ({selectedUsersCount, filteredUsersCount} : BulkActionsBa
         <TableRow sx={{borderBottom:'1px solid gray', backgroundColor:'#c8fad6'}}>
             <TableCell sx={{border:'none'}}>
                 <Checkbox  
-                indeterminate={selectedUsersCount > 0 && selectedUsersCount < filteredUsersCount}
-                checked={selectedUsersCount !== 0 && selectedUsersCount === filteredUsersCount}
+                indeterminate={selectedUsersCount > 0 && selectedUsersCount < sortedUsersCount}
+                checked={selectedUsersCount !== 0 && selectedUsersCount === sortedUsersCount}
                 onChange={handleHeaderCheckboxChange}/>
             </TableCell>
             <TableCell sx={{border:'none'}}>
