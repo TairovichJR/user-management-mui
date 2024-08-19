@@ -17,7 +17,6 @@ interface UsersState {
   userDetails: IUser | null;
   userDetailsLoading: boolean;
   userDetailsError: string | null;
-  dialog: boolean;
   snackbar: boolean;
   snackbarText: string;
 }
@@ -36,7 +35,6 @@ const initialState: UsersState = {
   userDetails: null,
   userDetailsLoading: false,
   userDetailsError: null,
-  dialog: false,
   snackbar: false,
   snackbarText: ''
 };
@@ -68,6 +66,11 @@ export const deleteUsersByIds = createAsyncThunk('users/deleteUsers', async (_, 
   return selectedUserIds;
 });
 
+export const createUser = createAsyncThunk('users/createUser', async ({user }: { user: IUser }) => {
+    console.log('create User Async called');
+    return await UserService.createUser(user);
+});
+
 const usersSlice = createSlice({
   name: 'users',
   initialState,
@@ -80,12 +83,6 @@ const usersSlice = createSlice({
     },
     closeSnackbar(state) {
       state.snackbar = false;
-    },
-    openDialog(state) {
-      state.dialog = true;
-    },
-    closeDialog(state) {
-      state.dialog = false;
     },
     setSearchKey(state, action: PayloadAction<string>) {
       state.searchKey = action.payload;
@@ -220,6 +217,19 @@ const usersSlice = createSlice({
         state.users = state.users.filter((user) => !action.payload.includes(user.id));
         state.selectedUserIds = [];
         usersSlice.caseReducers.setFilteredUsers(state);
+      })
+      .addCase(createUser.fulfilled, (state, action: PayloadAction<IUser>) => {
+        const newUser = action.payload;
+      
+        console.log('inside add case creat users');
+        // Generate a unique ID if necessary
+        newUser.id = state.users.length > 0 ? Math.max(...state.users.map(user => user.id)) + 1 : 1;
+        console.log(newUser);
+        // Instead of using push, create a new array with the new user
+        state.users = [...state.users, newUser];
+      
+        // Update the filtered users
+        usersSlice.caseReducers.setFilteredUsers(state);
       });
   },
 });
@@ -230,7 +240,7 @@ export const setIsFilterOn = (state: UsersState): boolean => {
 
 export const { 
   setSearchKey, setTab, toggleRole, resetAllFilters, setFilteredUsers, toggleHeaderCheckbox, toggleUserRowCheckbox,
-  deleteSelectedUsers, deleteSelectedUser, openDialog, closeDialog, openSnackbar, closeSnackbar, setSnackbarText 
+  deleteSelectedUsers, deleteSelectedUser, openSnackbar, closeSnackbar, setSnackbarText 
 } = usersSlice.actions;
 
 export default usersSlice.reducer;

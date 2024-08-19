@@ -24,7 +24,8 @@ class UserService {
   async createUser(user: IUser): Promise<IUser> {
     return new Promise((resolve) => {
       setTimeout(() => {
-        this.users.push(user);
+        this.users = [...this.users, user];
+        console.log('create user service called')
         resolve(user);
       }, 500);
     });

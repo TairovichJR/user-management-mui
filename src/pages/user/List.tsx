@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { fetchUsers } from "../../app/features/userSlice";
 import Loading from "../../components/Loading";
 import CustomSnackbar from "../../components/CustomSnackbar";
+import Add from "../../components/Add";
 
 const UserListPage = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,9 +21,11 @@ const UserListPage = () => {
   if (loading) {
     return <Loading />;
   }
+  
   return (
     <>
       <CustomSnackbar />
+      <Add />
       <StatusTabs />
       <UserFilters />
       <FilterTags />

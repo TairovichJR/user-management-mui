@@ -10,12 +10,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import UserRow from "./UserRow";
 import { RootState } from "../app/store";
 import BulkActionsBar from "./BulkActionsBar";
 import UserTableHeader from "./UserTableHeader";
 import { IUser } from "../model";
 import CustomPagination from "./CustomPagination";
+import ModalEdit from "./ModalEdit";
+import User from "./User";
 
 const UserTable: React.FC = () => {
   const filteredUsers = useSelector(
@@ -33,6 +34,8 @@ const UserTable: React.FC = () => {
   });
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [modal, setModal] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const sortedUsers = useMemo(() => {
     let sortableUsers = [...filteredUsers];
@@ -84,61 +87,90 @@ const UserTable: React.FC = () => {
     );
   }, [sortedUsers, page, rowsPerPage]);
 
-  return (
-    <TableContainer component={Paper}>
-      <Table>
-        {selectedUserIds.length === 0 && (
-          <UserTableHeader
-            selectedUsersCount={selectedUserIds.length}
-            sortedUsersCount={sortedUsers.length}
-            requestSort={requestSort}
-            sortConfig={sortConfig}
-          />
-        )}
-        {selectedUserIds.length > 0 && (
-          <BulkActionsBar
-            selectedUsersCount={selectedUserIds.length}
-            sortedUsersCount={sortedUsers.length}
-          />
-        )}
-        <TableBody sx={{ height: "390px" }}>
-          {paginatedUsers.map((user) => (
-            <UserRow user={user} key={user.id} />
-          ))}
+  // Calculate how many empty rows should be displayed to fill the table
+  const emptyRows = Math.max(0, rowsPerPage - paginatedUsers.length);
 
-          {paginatedUsers.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={7}
-                sx={{ p: 2, bgcolor: "rgb(145 158 171 / 4%)" }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <img
-                    src={require("../assets/images/no-data.svg").default}
-                    alt="No data"
-                  />
-                  <Typography component="h6">No Data</Typography>
-                </div>
-              </TableCell>
-            </TableRow>
+  return (
+    <>
+      {currentUserId && (
+        <ModalEdit
+          modal={modal}
+          setModal={setModal}
+          userId={currentUserId}
+        />
+      )}
+      <TableContainer component={Paper}>
+        <Table>
+          {selectedUserIds.length === 0 && (
+            <UserTableHeader
+              selectedUsersCount={selectedUserIds.length}
+              sortedUsersCount={sortedUsers.length}
+              requestSort={requestSort}
+              sortConfig={sortConfig}
+            />
           )}
-        </TableBody>
-      </Table>
-      <CustomPagination
-        count={sortedUsers.length}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </TableContainer>
+          {selectedUserIds.length > 0 && (
+            <BulkActionsBar
+              selectedUsersCount={selectedUserIds.length}
+              sortedUsersCount={sortedUsers.length}
+            />
+          )}
+          <TableBody>
+            {/* Render user rows */}
+            {paginatedUsers.map((user) => (
+              <User
+                user={user}
+                key={user.id}
+                onEdit={() => {
+                  setModal(true);
+                  setCurrentUserId(user.id);
+                }}
+              />
+            ))}
+            {/* Add empty rows to keep the table layout consistent */}
+
+            {(emptyRows > 0 && paginatedUsers.length > 0) && (
+              <TableRow style={{ height: 70 * emptyRows }}>
+                <TableCell colSpan={7} />
+              </TableRow>
+            )}
+            {/* No data case */}
+            {paginatedUsers.length === 0 && (
+              <TableRow>
+                <TableCell
+                className="abc"
+                  colSpan={7}
+                  sx={{ p: 2, bgcolor: "rgb(145 158 171 / 4%)", height: '390px' }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={require("../assets/images/no-data.svg").default}
+                      alt="No data"
+                    />
+                    <Typography component="h6">No Data</Typography>
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {/* Pagination on the table bottom */}
+        <CustomPagination
+          count={sortedUsers.length}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </TableContainer>
+    </>
   );
 };
 

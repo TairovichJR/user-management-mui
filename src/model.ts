@@ -7,7 +7,6 @@ export interface IUser {
     country:string;
     state:string;
     city:string;
-    countryCode: string;
     address:string;
     zip: string;
     company: string;

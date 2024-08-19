@@ -21,8 +21,8 @@ const CustomChip = styled(Chip)(({ theme }) => ({
 }));
 
 const FilterTags = () => {
+
   const dispatch = useDispatch();
-  
   const { tab, filteredUsers, toggledRoles, searchKey } = useSelector((state: RootState) => state.users);
   const isFilterOn = useSelector((state: RootState) => setIsFilterOn(state.users));
 

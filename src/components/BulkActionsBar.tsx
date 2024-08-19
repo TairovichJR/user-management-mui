@@ -26,6 +26,7 @@ const BulkActionsBar = ({
   selectedUsersCount,
   sortedUsersCount,
 }: BulkActionsBarProps) => {
+  
   const [delModal, setDelModal] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
 

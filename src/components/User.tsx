@@ -24,21 +24,20 @@ import Edit from "@mui/icons-material/Edit";
 import Delete from "@mui/icons-material/Delete";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import ModalEdit from "./ModalEdit";
 import CustomDialog from "./CustomDialog";
 
 interface UserItemProps {
   user: IUser;
+  onEdit: () => void;
 }
 
-const UserRow = ({ user }: UserItemProps) => {
+const User = ({ user, onEdit }: UserItemProps) => {
   const isUserSelected =
     useSelector((state: RootState) => state.users.selectedUserIds).indexOf(
       user.id
     ) !== -1;
   const dispatch = useDispatch<AppDispatch>();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [modal, setModal] = useState(false);
   const [delModal, setDelModal] = useState(false);
   const navigate = useNavigate();
 
@@ -63,7 +62,6 @@ const UserRow = ({ user }: UserItemProps) => {
 
   return (
     <>
-      <ModalEdit modal={modal} setModal={setModal} userId={user.id} />
       <TableRow key={user.id}>
         <TableCell sx={{ width: "10px" }}>
           <Checkbox
@@ -80,7 +78,7 @@ const UserRow = ({ user }: UserItemProps) => {
             alignContent: "center",
           }}
         >
-          {JSON.stringify(delModal)}
+
           <Avatar alt={user.name} src={user.imgSource} />
           <Box component="div">
             <Typography
@@ -111,7 +109,7 @@ const UserRow = ({ user }: UserItemProps) => {
         <TableCell>{user.status}</TableCell>
         <TableCell>
           <Tooltip title="Quick Edit">
-            <IconButton onClick={(e) => setModal(true)}>
+            <IconButton onClick={onEdit}>
               <Edit fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -154,4 +152,4 @@ const UserRow = ({ user }: UserItemProps) => {
   );
 };
 
-export default UserRow;
+export default User;

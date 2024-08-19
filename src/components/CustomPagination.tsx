@@ -19,8 +19,6 @@ const CustomPagination = ({
   onRowsPerPageChange
 }: CustomPaginationProps) => {
 
-  
-
   return (
     <Box padding={1} display="flex" justifyContent="end" alignItems="center" alignContent="center">
       <TablePagination
